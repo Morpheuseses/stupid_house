@@ -7,17 +7,24 @@ class HasTemp:
     def __init__(self,curtemp=0,settemp=0):
         self.curtemp = curtemp
         self.settemp = settemp
-class Openable:
-    pass
 
 class Heater(HasTemp):
-    pass
-class Window(HasTemp,Openable):
-    pass
-class Door(HasTemp,Openable):
-    pass
+    def __init__(self, curtemp=100, settemp=100,sensor_group=0):
+        super().__init__(self, curtemp=curtemp,settemp=settemp)
+        self.sensor_group = sensor_group
+class Window(HasTemp):
+    def __init__(self, curtemp=0, settemp=0,sensor_group=0):
+        super().__init__(self, curtemp=curtemp,settemp=settemp)
+        self.sensor_group = sensor_group
+        self.open = False
+class Door(HasTemp):
+    def __init__(self, curtemp=0, settemp=0,sensor_group=0):
+        super().__init__(self, curtemp=curtemp,settemp=settemp)
+        self.sensor_group = sensor_group
+        self.open = False
+
 class Sensor(HasTemp):
-    def __init__(self,row, col):
+    def __init__(self, row, col):
         super().__init__()
         self.X = col
         self.Y = row
@@ -28,10 +35,8 @@ def recalc():
 
 def recalc_temp():
     set_outdoor_temp(outdoor_temp)
-    recalculate_temp()
+    recalculate_temp(regulationType)
 
-def regulate(regulaitonType):
-    pass
 # Basic functions
 def getNeighbours4(arr, row, col):
     neighbours = []
@@ -82,7 +87,6 @@ def walls_coloring(colors, offset, color):
         colors[i][len(colors[0]) - 1 - offset] = color
     return colors
 
-
 def set_object(pos, setting_obj):
     match setting_obj:
         case 'heater':
@@ -120,11 +124,9 @@ def set_door(row, col):
     change_color(row, col, c.DOOR_COLOR)
     dont_change_mask[row][col] = False
 
-
 def set_sensor(row, col):
     global sensor_group
     sensors[sensor_group].append(Sensor(row,col))
-
 
 def set_window(row, col):
     change_color(row, col, c.WINDOW_COLOR)
@@ -145,10 +147,11 @@ def calc_average_sensors():
     pass
 
 # temp calculation
+def ReleRegulation(KR, desired_t, current_t):
+    pass
 
 def PRegulation(KP, desired_t, current_t):
     return KP * (current_t[-1] - desired_t)
-
 
 def PIRegulation(KP, KI, desired_t, current_t):
     si = 0
@@ -172,7 +175,7 @@ def PIDRegulation(KP, KI, KD, desired_t, current_t):
 K_window, K_door, K_wall, K_air = 0.02, 0.01, 0.008, 0.1
 
 
-def recalculate_temp():
+def recalculate_temp(regulationType):
     # Пройдем по всем клеткам
     new_temp = []
     for i in range(c.ROOM_SIZE_Y):
@@ -211,8 +214,8 @@ def recalculate_temp():
                         hot.append(k[i][j])
 
                     # print(temperature[-1][nr][nc])
-
-                    signal = PIRegulation(0.1, 0.00000005, temperatures[-1][nr][nc], hot)
+                    
+                    signal = RRegulation()*(regulationType == 'r') + PRegulation()*(regulationType == 'p') + PIRegulation(0.1, 0.00000005, temperatures[-1][nr][nc], hot)*(regulationType == 'pi')
 
                     #signal = PIRegulation(0.1, 0.00000005, temperature[-1][nr][nc], sensors_average)
 
@@ -237,7 +240,7 @@ screen = pygame.display.set_mode((c.WIDTH,c.HEIGHT))
 
 clock = pygame.time.Clock()
 
-regulationType = 'p' 
+regulationType = 'p' # r, p, pi, pid
 outdoor_temp   = 20
 desired_temp   = 17
 setting_obj    = 'heater'
