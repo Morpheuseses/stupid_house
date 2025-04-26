@@ -31,8 +31,11 @@ def handle_events():
                             Back.set_outdoor(i, j)
                     if event.button == 3:
                         if Back.squares[i][j].collidepoint(event.pos) and Back.dont_change_mask[i][j]:
-                            if (i,j) in Back.sensors:
-                                Back.sensors.remove((i,j))
+                            for k in range(len(Back.sensors)):
+                                for h in range(len(Back.sensors[k])):
+                                    if (Back.sensors[k][h].X == j and Back.sensors[k][h].Y == i):
+                                        Back.sensors[k].remove(Back.sensors[k][h])
+                                        break
                     if event.button == 4:
                         if Back.squares[i][j].collidepoint(event.pos) and Back.dont_change_mask[i][j]:
                             Back.temperatures[-1][i][j] += 5
@@ -60,6 +63,10 @@ def handle_events():
                 Back.outdoor_temp -=5
             if event.key == pygame.K_RIGHT:
                 Back.outdoor_temp +=5
+            if event.key == pygame.K_DOWN:
+                Back.desired_temp -=5
+            if event.key == pygame.K_UP:
+                Back.desired_temp +=5
             if event.key == pygame.K_6:
                 Back.regulationType = 'r'    
             if event.key == pygame.K_7:
@@ -78,6 +85,8 @@ def handle_events():
                 Back.sensor_group = 3
             if event.key == pygame.K_5:
                 Back.sensor_group = 4
+            if event.key == pygame.K_m:
+                Back.show_plot = True if not Back.show_plot else False
 
 running = True
 
