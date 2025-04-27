@@ -90,9 +90,11 @@ def handle_events():
 
 running = True
 
+fpsclock = pygame.time.Clock()
+
 while running:
     draw_all()
     recalc()
     handle_events()
-    pygame.time.wait(10)
+    fpsclock.tick(120)
 pygame.quit()

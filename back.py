@@ -248,7 +248,7 @@ def recalculate_temp(regulationType,t_desired):
                 else:
                     dtemp += K_air * dt_local
                 # если источник тепла - dtemp = 0
-                if colors[i][j] == c.HEATER_COLOR:
+                if colors[i][j] == c.HEATER_COLOR or colors[i][j] == c.OUTDOOR_COLOR:
                     dtemp = 0
             temperatures[-1][i][j] += dtemp
             # if dtemp > 0:
