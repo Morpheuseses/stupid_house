@@ -176,8 +176,8 @@ def PRegulation(KP, desired_t, current_t):
 def PIRegulation(KP, KI, desired_t, current_t):
     si = 0
     breaker = 0
-    for i in current_t:
-        si += i - desired_t
+    for i in range(len(current_t)-1,0,-1):
+        si += desired_t - current_t[i] 
         breaker += 1
         if breaker > 10:
             break
@@ -231,14 +231,19 @@ def recalculate_temp(regulationType,t_desired):
 
                     hot = []
                     for k in temperatures:
-                        hot.append(k[i][j])
+                        sum = 0   
+                        for s in sensors[0]:
+                            sum += k[s.Y][s.X]
+                        if len(sensors[0]) > 0:
+                            hot.append(sum / len(sensors[0]))
 
+                    
                     # print(temperature[-1][nr][nc])
                     
                     #signal = RRegulation()*(regulationType == 'r') + PRegulation()*(regulationType == 'p') + PIRegulation(0.1, 0.00000005, temperatures[-1][nr][nc], hot)*(regulationType == 'pi')
-                    signal = max((ReleRegulation(10, t_desired, hot)*(regulationType == 'r') +
+                    signal = max((ReleRegulation(100, t_desired, hot)*(regulationType == 'r') +
                               PRegulation(1.5, t_desired, hot)*(regulationType == 'p') +
-                              PIRegulation(0.1, 0.00000005, t_desired, hot)*(regulationType == 'pi')),0)
+                              PIRegulation(1.5, 0.5, t_desired, hot)*(regulationType == 'pi')),0)
                     #signal = PIRegulation(0.1, 0.00000005, temperature[-1][nr][nc], sensors_average)
 
                     # print("signal is", signal)
